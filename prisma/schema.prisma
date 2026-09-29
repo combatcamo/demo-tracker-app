@@ -1,0 +1,145 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  REP
+}
+
+enum UnitStatus {
+  AVAILABLE
+  OUT_ON_DEMO
+  SCHEDULED
+  IN_SERVICE
+}
+
+enum DemoStatus {
+  SCHEDULED
+  OUT_ON_DEMO
+  COMPLETED
+  CANCELLED
+}
+
+enum ConditionOut {
+  NEW
+  USED
+  DAMAGED
+  FOR_SALE
+}
+
+enum PhotoKind {
+  OUT
+  IN
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  pinHash      String
+  role         Role     @default(REP)
+  active       Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  demosAsRep   Demo[]   @relation("DemoRep")
+  demosCreated Demo[]   @relation("DemoCreator")
+  soldCreated  SoldRecord[] @relation("SoldCreator")
+  auditLogs    AuditLog[]
+}
+
+model EquipmentUnit {
+  id        String     @id @default(cuid())
+  name      String
+  category  String
+  serial    String     @unique
+  status    UnitStatus @default(AVAILABLE)
+  notes     String?
+  createdAt DateTime   @default(now())
+  demos     Demo[]
+}
+
+model Demo {
+  id                        String       @id @default(cuid())
+  repId                     String
+  rep                       User         @relation("DemoRep", fields: [repId], references: [id])
+  customerCompany           String
+  contactName               String
+  contactPhone              String
+  deliveryAddress           String?
+  pickupAtBranch            Boolean      @default(false)
+  deliverToCustomer         Boolean      @default(false)
+  customerReturnsToBranch   Boolean      @default(false)
+  checkoutDate              DateTime
+  expectedReturnDate        DateTime
+  unitId                    String
+  unit                      EquipmentUnit @relation(fields: [unitId], references: [id])
+  conditionOut              ConditionOut
+  hoursOut                  String
+  customerIdVerified        Boolean      @default(false)
+  outNotes                  String?
+  reminderDaysBefore        Int          @default(3)
+  includeResponsibilityRecord Boolean    @default(true)
+  signatureData             String?      @db.Text
+  signatureDate             DateTime?
+  status                    DemoStatus   @default(SCHEDULED)
+  hoursIn                   String?
+  conditionIn               String?
+  returnNotes               String?
+  checkedInAt               DateTime?
+  followUpNote              String?
+  createdById               String
+  createdBy                 User         @relation("DemoCreator", fields: [createdById], references: [id])
+  photos                    DemoPhoto[]
+  createdAt                 DateTime     @default(now())
+  updatedAt                 DateTime     @updatedAt
+
+  @@index([status])
+  @@index([unitId])
+  @@index([checkoutDate])
+  @@index([expectedReturnDate])
+}
+
+model DemoPhoto {
+  id        String    @id @default(cuid())
+  demoId    String
+  demo      Demo      @relation(fields: [demoId], references: [id], onDelete: Cascade)
+  kind      PhotoKind
+  data      Bytes
+  mimeType  String
+  createdAt DateTime  @default(now())
+
+  @@index([demoId])
+}
+
+model SoldRecord {
+  id              String    @id @default(cuid())
+  description     String
+  customerCompany String
+  amount          Decimal?  @db.Decimal(12, 2)
+  soldDate        DateTime
+  invoiced        Boolean   @default(false)
+  notes           String?
+  createdById     String
+  createdBy       User      @relation("SoldCreator", fields: [createdById], references: [id])
+  createdAt       DateTime  @default(now())
+
+  @@index([invoiced])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  action     String
+  entityType String
+  entityId   String
+  details    String?
+  createdAt  DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
