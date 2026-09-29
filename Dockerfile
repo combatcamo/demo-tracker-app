@@ -9,6 +9,8 @@ FROM node:22-alpine AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+# Ensure public/ exists so the runner-stage COPY below never fails (repo has no static assets).
+RUN mkdir -p public
 ENV NEXT_TELEMETRY_DISABLED=1
 # Dummy URL: only used so Prisma can parse the schema at build time.
 # Railway injects the real DATABASE_URL when the app runs.
