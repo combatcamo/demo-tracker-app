@@ -26,6 +26,7 @@ RUN addgroup -S nodejs && adduser -S nextjs -G nodejs
 # prisma CLI + production deps (for `prisma migrate deploy` on boot)
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
+COPY scripts ./scripts
 RUN npm ci --omit=dev
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
@@ -41,4 +42,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Apply DB migrations, seed the admin if needed, then start the app
-CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma db seed && node server.js"]
+CMD ["node", "scripts/start.mjs"]

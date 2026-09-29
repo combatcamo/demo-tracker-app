@@ -5,11 +5,14 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["demo_tracker"]
 }
 
 enum Role {
   ADMIN
   REP
+
+  @@schema("demo_tracker")
 }
 
 enum UnitStatus {
@@ -17,6 +20,8 @@ enum UnitStatus {
   OUT_ON_DEMO
   SCHEDULED
   IN_SERVICE
+
+  @@schema("demo_tracker")
 }
 
 enum DemoStatus {
@@ -24,6 +29,8 @@ enum DemoStatus {
   OUT_ON_DEMO
   COMPLETED
   CANCELLED
+
+  @@schema("demo_tracker")
 }
 
 enum ConditionOut {
@@ -31,11 +38,15 @@ enum ConditionOut {
   USED
   DAMAGED
   FOR_SALE
+
+  @@schema("demo_tracker")
 }
 
 enum PhotoKind {
   OUT
   IN
+
+  @@schema("demo_tracker")
 }
 
 model User {
@@ -49,6 +60,8 @@ model User {
   demosCreated Demo[]   @relation("DemoCreator")
   soldCreated  SoldRecord[] @relation("SoldCreator")
   auditLogs    AuditLog[]
+
+  @@schema("demo_tracker")
 }
 
 model EquipmentUnit {
@@ -60,6 +73,8 @@ model EquipmentUnit {
   notes     String?
   createdAt DateTime   @default(now())
   demos     Demo[]
+
+  @@schema("demo_tracker")
 }
 
 model Demo {
@@ -101,6 +116,8 @@ model Demo {
   @@index([unitId])
   @@index([checkoutDate])
   @@index([expectedReturnDate])
+
+  @@schema("demo_tracker")
 }
 
 model DemoPhoto {
@@ -113,6 +130,8 @@ model DemoPhoto {
   createdAt DateTime  @default(now())
 
   @@index([demoId])
+
+  @@schema("demo_tracker")
 }
 
 model SoldRecord {
@@ -128,6 +147,8 @@ model SoldRecord {
   createdAt       DateTime  @default(now())
 
   @@index([invoiced])
+
+  @@schema("demo_tracker")
 }
 
 model AuditLog {
@@ -142,4 +163,6 @@ model AuditLog {
 
   @@index([entityType, entityId])
   @@index([createdAt])
+
+  @@schema("demo_tracker")
 }

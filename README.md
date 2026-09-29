@@ -17,6 +17,28 @@ A private web app for tracking demo and loaner equipment: who has what, when it 
 
 ## Deploying on Railway — one click at a time
 
+### Current database: Supabase FindIT
+
+This app uses only the `demo_tracker` schema inside the existing FindIT project.
+All Prisma models, enums, and initial migration objects explicitly target that schema.
+The Docker startup script sets `schema=demo_tracker` on `DATABASE_URL` before running
+migrations, seeding, or starting the server. It preserves other connection options.
+
+Set `DATABASE_URL` on the app service to FindIT's PostgreSQL **session pooler**
+connection string (port 5432), with `schema=demo_tracker&sslmode=require` in its query
+parameters. Use a database login restricted to the app schema where possible.
+Keep the actual password in environment variables; never commit it to this repository.
+The existing `SESSION_SECRET`, `ADMIN_NAME`, and `ADMIN_PIN` settings are still needed.
+A GitHub push deploys code but does not create or populate these environment variables.
+
+The initial migration is for a fresh `demo_tracker` schema. Do not run `db push`,
+`migrate reset`, or a migration that moves existing FindIT tables. This setup does not
+move data from an earlier demo-tracker installation. Backups for this configuration
+are managed in Supabase, not Railway.
+
+The walkthrough below describes the alternative of creating a separate Railway
+database; skip that database creation step when using the existing FindIT project.
+
 You'll do this once. It takes about 20 minutes. You need: this code on your computer (or in a GitHub account), a Railway account, and a credit card for Railway (their free trial covers small apps; the database + app typically costs a few dollars a month).
 
 ### Part 1 — Get the code into GitHub
