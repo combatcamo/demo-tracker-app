@@ -28,7 +28,8 @@ try {
   console.log("Using the demo_tracker database schema.");
   const prismaCli = require.resolve("prisma/build/index.js");
   await run([prismaCli, "migrate", "deploy"]);
-  await run([prismaCli, "db", "seed"]);
+  // Direct Node startup does not add node_modules/.bin to PATH like npm/npx.
+  await run([require.resolve("tsx/cli"), "prisma/seed.ts"]);
   await run(["server.js"]);
 } catch (error) {
   console.error(error.message);
