@@ -1,5 +1,5 @@
--- CreateSchema
-CREATE SCHEMA IF NOT EXISTS "demo_tracker";
+-- The demo_tracker schema is provisioned separately by the database administrator.
+-- The app login intentionally cannot create schemas or alter other FindIT areas.
 
 -- CreateEnum
 CREATE TYPE "demo_tracker"."Role" AS ENUM ('ADMIN', 'REP');
