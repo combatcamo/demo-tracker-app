@@ -28,6 +28,7 @@ try {
     assert.match(r.headers.get('cache-control'),/no-store/);
     const {results}=await r.json();
     assert(results.length>0 && results.length<=20);
+    if(kind==='customers') assert(results.every(r=>r.store_location==='03'), 'Customer suggestions must be store 03 only');
     assert(!JSON.stringify(results).includes('credit_limit'));
     assert(!JSON.stringify(results).includes('total_ar'));
     if(kind==='equipment') assert(results.every(r=>r.stock_number && 'branch' in r && 'serial_number' in r));

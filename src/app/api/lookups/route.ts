@@ -17,7 +17,8 @@ export async function GET(req: Request) {
     // Explicit read-only columns; values are parameterized, never interpolated SQL.
     const results = kind === "customers"
       ? await prisma.$queryRaw`SELECT customer_number, store_location, name, contact_name, phone_number, address
-          FROM public.customers WHERE name ILIKE ${pattern} OR customer_number ILIKE ${pattern}
+          FROM public.customers WHERE store_location = '03'
+            AND (name ILIKE ${pattern} OR customer_number ILIKE ${pattern})
           ORDER BY name, customer_number, store_location LIMIT 20`
       : await prisma.$queryRaw`SELECT id, stock_number, serial_number, make, model, description, category,
           branch, store_location, machine_location

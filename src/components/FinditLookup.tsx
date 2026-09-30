@@ -39,10 +39,10 @@ export default function FinditLookup({ kind, onPick }: { kind: "customers" | "eq
     return () => { clearTimeout(timer); controller.abort(); };
   }, [q, kind]);
   return <div className="mb-4 rounded-xl border border-orange-200 bg-orange-50 p-3">
-    <label className="block text-sm font-semibold">{kind === "customers" ? "FindIT customer autofill" : "FindIT equipment autofill"}
+    <label className="block text-sm font-semibold">{kind === "customers" ? "FindIT customer autofill — Store 03" : "FindIT equipment autofill"}
       <input className={`${inputCls} mt-2`} value={q} maxLength={100} onChange={e => setQ(e.target.value)} placeholder={kind === "customers" ? "Search company or customer number (2+ characters)" : "Search stock, serial, make or model (all stores)"} autoComplete="off" />
     </label>
-    <p className="mt-2 text-xs text-gray-600">Read-only lookup. Selecting a match does not change FindIT. Showing up to 20 matches; narrow your search if needed.</p>
+    <p className="mt-2 text-xs text-gray-600">{kind === "customers" ? "Customer suggestions are limited to store 03. If not found, enter the customer and contact details manually. " : ""}Read-only lookup. Selecting a match does not change FindIT. Showing up to 20 matches; narrow your search if needed.</p>
     <p className="text-sm" role="status">{message}</p>
     <div className="max-h-64 overflow-auto">
       {rows.map(r => <button type="button" key={kind === "customers" ? JSON.stringify([r.customer_number, r.store_location]) : r.id || r.stock_number}
