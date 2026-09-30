@@ -6,6 +6,7 @@ import Link from "next/link";
 import { PageTitle, Card, Field, inputCls, Btn, UnitStatusBadge, EmptyState } from "@/components/ui";
 import { fmtDate } from "@/lib/demos";
 import type { UnitView } from "./page";
+import FinditLookup, { equipmentName, equipmentSource } from "@/components/FinditLookup";
 
 export default function EquipmentClient({
   initialUnits,
@@ -129,6 +130,16 @@ export default function EquipmentClient({
         <Card className="mb-4">
           <h2 className="mb-3 text-lg font-bold">{editing ? "Edit unit" : "Add unit"}</h2>
           <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <FinditLookup kind="equipment" onPick={r => {
+                setName(equipmentName(r));
+                setSerial(r.serial_number || "");
+                setCategory("__new");
+                setNewCategory(r.category || "Equipment");
+                setNotes(equipmentSource(r));
+              }} />
+              <p className="text-xs text-gray-600">Verify the physical machine and store before saving. Duplicate serial matches are shown separately by stock number. Saving affects Demo Tracker only.</p>
+            </div>
             <Field label="Unit name">
               <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} placeholder="e.g. UTG T5" />
             </Field>

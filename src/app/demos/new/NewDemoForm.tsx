@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 import { PageTitle, Card, Field, inputCls, Btn } from "@/components/ui";
 import SignaturePad from "@/components/SignaturePad";
+import FinditLookup from "@/components/FinditLookup";
 import PhotoInput, { type PickedPhoto } from "@/components/PhotoInput";
 import SerialPlateScanner, { type PlateScanResult } from "@/components/SerialPlateScanner";
 
@@ -130,6 +131,12 @@ function NewDemoFormInner({
   useEffect(() => {
     const t = setTimeout(() => void loadFreeUnits(), 300);
     return () => clearTimeout(t);
+  }, [loadFreeUnits]);
+
+  useEffect(() => {
+    const refresh = () => void loadFreeUnits();
+    window.addEventListener("focus", refresh);
+    return () => window.removeEventListener("focus", refresh);
   }, [loadFreeUnits]);
 
   const handleScan = (text: string) => {
@@ -281,6 +288,12 @@ function NewDemoFormInner({
 
         <Card>
           <h2 className="mb-3 text-lg font-bold">Customer</h2>
+          <FinditLookup kind="customers" onPick={r => {
+            setCustomerCompany(r.name || "");
+            setContactName(r.contact_name || "");
+            setContactPhone(r.phone_number || "");
+            setDeliveryAddress(r.address || "");
+          }} />
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Customer company">
               <input value={customerCompany} onChange={(e) => setCustomerCompany(e.target.value)} className={inputCls} required />
@@ -305,6 +318,7 @@ function NewDemoFormInner({
 
         <Card>
           <h2 className="mb-3 text-lg font-bold">Unit</h2>
+          <p className="mb-3 text-sm"><a className="font-semibold text-orange-700 underline" href="/equipment" target="_blank" rel="noreferrer">FindIT equipment autofill: add a unit under Equipment</a>, then return here. All stores can be searched; FindIT serials are never changed.</p>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Category">
               <select value={category} onChange={(e) => setCategory(e.target.value)} className={inputCls}>

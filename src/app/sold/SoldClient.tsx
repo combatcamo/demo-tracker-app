@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { PageTitle, Card, Field, inputCls, Btn, EmptyState } from "@/components/ui";
 import { fmtDate } from "@/lib/demos";
 import type { SoldView } from "./page";
+import FinditLookup, { equipmentName, equipmentSource } from "@/components/FinditLookup";
 
 function todayStr(): string {
   return new Date().toISOString().slice(0, 10);
@@ -95,6 +96,13 @@ export default function SoldClient({ initialRecords }: { initialRecords: SoldVie
         <Card className="mb-4">
           <h2 className="mb-3 text-lg font-bold">{editing ? "Edit sold record" : "Add sold record"}</h2>
           <form onSubmit={save} className="grid gap-4 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <FinditLookup kind="customers" onPick={r => setCustomerCompany(r.name || "")} />
+              <FinditLookup kind="equipment" onPick={r => {
+                setDescription(`${equipmentName(r)} — Serial ${r.serial_number || "unknown"}`);
+                setNotes(equipmentSource(r));
+              }} />
+            </div>
             <div className="sm:col-span-2">
               <Field label="Description">
                 <input value={description} onChange={(e) => setDescription(e.target.value)} className={inputCls} required placeholder="e.g. UTG T5 — Serial 8573204" />
